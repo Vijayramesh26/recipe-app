@@ -68,16 +68,76 @@
       </v-col>
 
       <v-col cols="12">
-        <v-file-input
-          label="Hero Image"
-          accept="image/*"
-          variant="solo"
-          flat
-          prepend-icon="mdi-camera"
-          class="bento-card border ultra-field"
-          bg-color="grey-lighten-5"
-          @change="handleImageUpload"
-        ></v-file-input>
+        <v-card class="bento-card pa-6 border shadow-sm mb-4">
+          <div class="d-flex align-center justify-space-between mb-4">
+            <h3 class="text-h6 font-weight-black">Recipe Media</h3>
+          </div>
+
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-file-input
+                label="Upload Image"
+                accept="image/*"
+                variant="solo"
+                flat
+                prepend-icon="mdi-camera"
+                class="rounded-lg border bg-slate-50 mb-4"
+                density="comfortable"
+                @change="handleImageUpload"
+              ></v-file-input>
+              <div
+                class="text-center py-2 opacity-50 font-weight-black text-overline"
+              >
+                OR
+              </div>
+              <v-text-field
+                v-model="formData.image"
+                label="Image URL"
+                placeholder="https://example.com/image.jpg"
+                variant="solo"
+                flat
+                prepend-icon="mdi-link-variant"
+                class="rounded-lg border bg-slate-50 mt-2"
+                density="comfortable"
+                hide-details
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="6" class="d-flex align-center justify-center">
+              <div
+                v-if="formData.image"
+                class="preview-container shadow-premium rounded-xl overflow-hidden border"
+              >
+                <v-img :src="formData.image" cover height="180" width="100%">
+                  <template v-slot:placeholder>
+                    <v-row
+                      class="fill-height ma-0"
+                      align="center"
+                      justify="center"
+                    >
+                      <v-progress-circular
+                        indeterminate
+                        color="primary"
+                      ></v-progress-circular>
+                    </v-row>
+                  </template>
+                </v-img>
+                <div
+                  class="preview-badge bg-primary text-white text-caption font-weight-black px-3 py-1"
+                >
+                  PREVIEW
+                </div>
+              </div>
+              <div
+                v-else
+                class="preview-placeholder d-flex flex-column align-center justify-center border rounded-xl opacity-20"
+              >
+                <v-icon size="64">mdi-image-outline</v-icon>
+                <div class="text-caption font-weight-black mt-2">NO IMAGE</div>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card>
       </v-col>
 
       <!-- Ingredients Section -->
@@ -328,5 +388,28 @@ export default {
 
 .v-slide-y-transition-move {
   transition: transform 0.4s ease;
+}
+
+.preview-container {
+  height: 180px;
+  width: 100%;
+  position: relative;
+  background: #f8fafc;
+}
+
+.preview-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border-radius: 6px;
+  z-index: 2;
+  letter-spacing: 0.1em;
+}
+
+.preview-placeholder {
+  height: 180px;
+  width: 100%;
+  border: 2px dashed #cbd5e1;
+  background: #f8fafc;
 }
 </style>
