@@ -163,7 +163,7 @@
           <v-col cols="12">
             <v-card class="bento-card pa-8 shadow-premium border glass-card">
               <div class="d-flex align-center justify-space-between mb-2">
-                <h3 class="text-h6 font-weight-black">Cloud Sync (SkySQL)</h3>
+                <h3 class="text-h6 font-weight-black">Cloud Sync (Firebase)</h3>
                 <v-chip
                   :color="statusColor"
                   size="small"
@@ -174,19 +174,31 @@
                 </v-chip>
               </div>
               <p class="text-body-2 font-weight-medium text-grey mb-6">
-                Your recipes are synchronized with MariaDB SkySQL for
-                cross-device access.
+                Your recipes are synchronized with Firebase Firestore for
+                real-time, cross-device access.
               </p>
-              <v-btn
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-sync"
-                class="font-weight-black"
-                :loading="cloudStatus === 'syncing'"
-                @click="syncWithCloud"
-              >
-                Sync Now
-              </v-btn>
+              <div class="d-flex flex-wrap gap-3">
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  prepend-icon="mdi-sync"
+                  class="font-weight-black"
+                  :loading="cloudStatus === 'syncing'"
+                  @click="syncWithCloud"
+                >
+                  Sync Now
+                </v-btn>
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  prepend-icon="mdi-cloud-upload"
+                  class="font-weight-black"
+                  :loading="cloudStatus === 'syncing'"
+                  @click="handleForcePush"
+                >
+                  Upload Local Data
+                </v-btn>
+              </div>
             </v-card>
           </v-col>
         </v-row>
@@ -230,7 +242,21 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useRecipeStore, ["importRecipes", "syncWithCloud"]),
+    ...mapActions(useRecipeStore, [
+      "importRecipes",
+      "syncWithCloud",
+      "forcePushToCloud",
+    ]),
+    async handleForcePush() {
+      const success = await this.forcePushToCloud();
+      if (success) {
+        alert("All local recipes have been pushed to Firebase!");
+      } else {
+        alert(
+          "Failed to push recipes. Check your connection or Firebase Rules.",
+        );
+      }
+    },
     exportData() {
       const data = JSON.stringify(this.recipes, null, 2);
       const blob = new Blob([data], { type: "application/json" });
@@ -246,8 +272,8 @@ export default {
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const success = this.importRecipes(e.target.result);
+      reader.onload = async (e) => {
+        const success = await this.importRecipes(e.target.result);
         if (success) {
           alert("Recipes imported successfully!");
         } else {
