@@ -31,6 +31,8 @@
 
 <script>
 import logo from "@/assets/logo.png";
+import { useRecipeStore } from "@/store/recipeStore";
+import { mapActions } from "pinia";
 
 export default {
   name: "App",
@@ -40,7 +42,13 @@ export default {
       logo,
     };
   },
+  methods: {
+    ...mapActions(useRecipeStore, ["syncWithCloud"]),
+  },
   mounted() {
+    // Initialize cloud sync
+    this.syncWithCloud();
+
     // Reveal the app after 2.5 seconds of splash magic
     setTimeout(() => {
       this.showSplash = false;
